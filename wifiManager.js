@@ -1,29 +1,53 @@
-
 const { exec } = require('child_process');
 
-function scanNetworks(callback) {
-    exec('sudo iwlist wlan0 scan | grep ESSID', (err, stdout) => {
+function getWifiInterface(callback) {
+    exec("ls /sys/class/net | grep -E '^wl|^wlan'", (err, stdout) => {
         if (err) {
-            console.error('Erro ao escanear redes Wi-Fi:', err);
+            console.error('Erro ao obter a interface Wi-Fi:', err);
+            return callback(null);
+        }
+        const interfaceName = stdout.split('\n')[0].trim();
+        callback(interfaceName || null);
+    });
+}
+
+function scanNetworks(callback) {
+    getWifiInterface((interfaceName) => {
+        if (!interfaceName) {
+            console.error('Nenhuma interface Wi-Fi encontrada');
             return callback([]);
         }
 
-        const networks = stdout.split('\n')
-            .filter(line => line.includes('ESSID'))
-            .map(line => line.match(/ESSID:"(.*)"/)[1]);
+        exec(`sudo iwlist ${interfaceName} scan | grep ESSID`, (err, stdout) => {
+            if (err) {
+                console.error('Erro ao escanear redes Wi-Fi:', err);
+                return callback([]);
+            }
 
-        callback(networks);
+            const networks = stdout.split('\n')
+                .filter(line => line.includes('ESSID'))
+                .map(line => line.match(/ESSID:"(.*)"/)[1]);
+
+            callback(networks);
+        });
     });
 }
 
 function connectToNetwork(ssid, password, callback) {
-    exec(`bash ./scripts/connect_wifi.sh '${ssid}' '${password}'`, (err, stdout) => {
-        if (err) {
-            console.error('Erro ao conectar à rede Wi-Fi:', err);
+    getWifiInterface((interfaceName) => {
+        if (!interfaceName) {
+            console.error('Nenhuma interface Wi-Fi encontrada');
             return callback(false);
         }
 
-        callback(stdout.includes('Conectado com sucesso'));
+        exec(`bash ./scripts/connect_wifi.sh '${interfaceName}' '${ssid}' '${password}'`, (err, stdout) => {
+            if (err) {
+                console.error('Erro ao conectar à rede Wi-Fi:', err);
+                return callback(false);
+            }
+
+            callback(stdout.includes('Conectado com sucesso'));
+        });
     });
 }
 

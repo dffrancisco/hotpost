@@ -1,0 +1,40 @@
+# Arquivos de compilação e saída
+/dist/
+/node_modules/
+/release/
+*.log
+/dist-electron/
+/deployer
+
+# Arquivos de configuração
+.env.local
+.env.*.local
+.env.development
+.env.*.development
+.env.test
+.env.*.test
+.env.production
+.env.*.production
+
+# Arquivos de criação de projeto Vue
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Dependências específicas do gerenciador de pacotes (por exemplo, npm-debug.log)
+npm-debug.log
+
+# Editor específico
+.vscode/
+
+# Arquivos de compilação e saída do Webpack
+/build/
+
+# Outros arquivos e diretórios gerados
+.DS_Store
+Thumbs.db
+.cache/
+dist/
+dist/*
+
+Telas.zip
