@@ -1,0 +1,15 @@
+
+{
+  "name": "orange-pi-hotspot",
+  "version": "1.0.0",
+  "description": "Hotspot para configurar a conexão Wi-Fi em OrangePi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Usuário",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

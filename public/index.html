@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexão Wi-Fi</title>
+</head>
+<body>
+    <h1>Conectar à Rede Wi-Fi</h1>
+    <div>
+        <button id="scan">Escanear Redes</button>
+        <ul id="networks"></ul>
+    </div>
+    <div id="connection-form" style="display: none;">
+        <h2>Conectar a <span id="selected-ssid"></span></h2>
+        <input type="password" id="password" placeholder="Senha">
+        <button id="connect">Conectar</button>
+    </div>
+
+    <script>
+        document.getElementById('scan').addEventListener('click', () => {
+            fetch('/scan')
+                .then(response => response.json())
+                .then(networks => {
+                    const list = document.getElementById('networks');
+                    list.innerHTML = '';
+                    networks.forEach(network => {
+                        const item = document.createElement('li');
+                        item.textContent = network;
+                        item.addEventListener('click', () => {
+                            document.getElementById('selected-ssid').textContent = network;
+                            document.getElementById('connection-form').style.display = 'block';
+                        });
+                        list.appendChild(item);
+                    });
+                });
+        });
+
+        document.getElementById('connect').addEventListener('click', () => {
+            const ssid = document.getElementById('selected-ssid').textContent;
+            const password = document.getElementById('password').value;
+
+            fetch('/connect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ssid, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'connected') {
+                    alert('Conectado com sucesso!');
+                } else {
+                    alert('Falha na conexão.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
